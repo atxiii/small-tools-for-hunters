@@ -1,0 +1,85 @@
+#!/bin/bash
+
+# Script Name: SANDiscover
+# Description: A script for discovery SANs according url
+# Author: Hossein Sh.
+# Created: 2023 M05 30, Tue 08:47
+# Version: v1.0.0
+#
+
+echo "" > "/tmp/sans_arr_sans"
+
+
+depth=2
+sans_clean=''
+k=0
+OPTIONS="d:"
+LONG_OPTIONS="depth,help"
+PARSED_OPTIONS=$(getopt -o "$OPTIONS" --long "$LONG_OPTIONS" -- "$@")
+
+if [ $? -ne 0 ]; then
+    echo "Error: Invalid option"
+    exit 1
+fi
+
+eval set -- "$PARSED_OPTIONS"
+
+help_fn() {
+    echo "Usage: $0 [OPTIONS] "
+    echo ""
+    echo "OPTIONS: [-d,-h]"
+    echo "  -d, --depth     Set the depth of the deep search (default=2)"
+    echo "  -h, --help      Help!"
+    echo "==Examples================"
+				echo "crtsh -u thewaltdisneycompany.com --silent | sans | tee thedisney-sans.subs"
+				echo "cat subs_domains.txt | sans -d 3 | tee output.subs"
+}
+
+while true; do
+    case "$1" in
+        -d|--depth)
+            depth=$2
+            shift 2
+            ;;
+        -h|--help)
+            help_fn
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Error: Invalid option"
+            exit 1
+            ;;
+    esac
+done
+
+get_sans(){
+		while read -r d && [ "$k" -lt "$depth" ]; do
+						d=${d#*//}
+
+						echo -e "\033[0;33m[🐱]\033[0;35m Looking for SANs in: $d\033[0m" >&2
+
+						if echo "$(curl --max-time 5 -s "$d:443")" | grep -iq "HTML"; then
+										{
+														sans=$(echo | openssl s_client -connect "$d:443" 2>&1 | openssl x509 -noout -text | awk '/Subject: C=/{printf $NF"\n"} /DNS:/{x=gsub(/ *DNS:/, ""); printf "" $0"\n"}')
+														sans_clean=$(echo $sans | sed 's/,/\n/g;s/\*.//g' | sort -u)
+														echo $sans_clean | tr ' ' '\n'
+										} >&1
+										echo $sans_clean >> "/tmp/sans_arr_sans"
+						fi
+		done
+		if [ "$k" -lt "$depth" ];then
+				k=$((k+1))
+				cat "/tmp/sans_arr_sans" | tr ' ' '\n' | sort -u | get_sans
+		else
+				echo '=====================================' >&2
+				echo -e '\033[0;35m[🐱]\033[0;36m Finish\033[0m' >&2
+				rm -rf "/tmp/sans_arr_sans"
+		fi
+}
+
+get_sans
+
