@@ -9,7 +9,6 @@
 
 echo "" > "/tmp/sans_arr_sans"
 
-
 depth=2
 sans_clean=''
 k=0
@@ -31,8 +30,8 @@ help_fn() {
     echo "  -d, --depth     Set the depth of the deep search (default=2)"
     echo "  -h, --help      Help!"
     echo "==Examples================"
-				echo "crtsh -u thewaltdisneycompany.com --silent | sans | tee thedisney-sans.subs"
-				echo "cat subs_domains.txt | sans -d 3 | tee output.subs"
+    echo "crtsh -u thewaltdisneycompany.com --silent | sans | tee thedisney-sans.subs"
+    echo "cat subs_domains.txt | sans -d 3 | tee output.subs"
 }
 
 while true; do
@@ -58,18 +57,18 @@ done
 
 get_sans(){
 		while read -r d && [ "$k" -lt "$depth" ]; do
-						d=${d#*//}
+            d=${d#*//}
 
-						echo -e "\033[0;33m[🐱]\033[0;35m Looking for SANs in: $d\033[0m" >&2
+            echo -e "\033[0;33m[🐱]\033[0;35m Looking for SANs in: $d\033[0m" >&2
 
-						if echo "$(curl --max-time 5 -s "$d:443")" | grep -iq "HTML"; then
-										{
-														sans=$(echo | openssl s_client -connect "$d:443" 2>&1 | openssl x509 -noout -text | awk '/Subject: C=/{printf $NF"\n"} /DNS:/{x=gsub(/ *DNS:/, ""); printf "" $0"\n"}')
-														sans_clean=$(echo $sans | sed 's/,/\n/g;s/\*.//g' | sort -u)
-														echo $sans_clean | tr ' ' '\n'
-										} >&1
-										echo $sans_clean >> "/tmp/sans_arr_sans"
-						fi
+            if echo "$(curl --max-time 5 -s "$d:443")" | grep -iq "HTML"; then
+                {
+                    sans=$(echo | openssl s_client -connect "$d:443" 2>&1 | openssl x509 -noout -text | awk '/Subject: C=/{printf $NF"\n"} /DNS:/{x=gsub(/ *DNS:/, ""); printf "" $0"\n"}')
+                    sans_clean=$(echo $sans | sed 's/,/\n/g;s/\*.//g' | sort -u)
+                    echo $sans_clean | tr ' ' '\n'
+                } >&1
+                echo $sans_clean >> "/tmp/sans_arr_sans"
+            fi
 		done
 		if [ "$k" -lt "$depth" ];then
 				k=$((k+1))
@@ -80,6 +79,5 @@ get_sans(){
 				rm -rf "/tmp/sans_arr_sans"
 		fi
 }
-
 get_sans
 
