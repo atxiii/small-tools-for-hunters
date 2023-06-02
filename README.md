@@ -101,6 +101,5 @@ echo "target.tld" | sans -d 4 | tee target-sans.subs
 
 Feel free to customize and enhance this document based on your specific needs and requirements.
 
-Date: "`r format(Sys.time(), '%d %B, %Y')`"
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/discoverscripts.svg?style=social&label=Follow)](https://twitter.com/hoseinshurabi)
