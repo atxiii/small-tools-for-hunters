@@ -4,6 +4,8 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 import sys
+from urllib.parse import urlparse
+
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
 def extract_subdomains(url):
@@ -12,7 +14,7 @@ def extract_subdomains(url):
     if response.status_code == 200:
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
-        subdomains_header = soup.find('h4', text='Subdomains')
+        subdomains_header = soup.find('h4', string='Subdomains')
         if subdomains_header:
             subdomains = subdomains_header.find_next('ul').find_all('li')
             subdomain_list = [subdomain.text for subdomain in subdomains]
@@ -24,14 +26,40 @@ def extract_subdomains(url):
 
     return []
 
+def add_main_domain_if_missing(url, subdomain):
+    if not url.startswith(subdomain):
+        return subdomain +"."+ url
+    return subdomain
+
+
+def process_urls(urls, output_file=None, silent=False):
+
+    for url in urls:
+        subdomains = extract_subdomains(url)
+
+        if not silent:
+            print(f"Subdomains for {url}:")
+            for subdomain in subdomains:
+                print(add_main_domain_if_missing(url, subdomain))
+            print()
+
+    if output_file:
+        with open(output_file, 'w') as f:
+            for subdomain in subdomains_all:
+                f.write(add_main_domain_if_missing(url, subdomain) + '\n')
+    elif not silent:
+        for subdomain in subdomains_all:
+            print(add_main_domain_if_missing(url, subdomain))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract subdomains from URLs')
     parser.add_argument('-urls', nargs='*', help='URLs to extract subdomains from')
+    parser.add_argument('-o', dest='output_file', help='Save subdomains to a file')
+    parser.add_argument('-s', '--silent', action='store_true', help='Silent mode')
     args = parser.parse_args()
 
     urls = args.urls
 
-    # If URLs are not provided as command-line arguments, check if input is piped
     if not urls and not sys.stdin.isatty():
         urls = sys.stdin.read().splitlines()
 
@@ -39,9 +67,4 @@ if __name__ == '__main__':
         print('No URLs provided.')
         sys.exit(1)
 
-    for url in urls:
-        subdomains = extract_subdomains(url)
-        print(f"Subdomains for {url}:")
-        for subdomain in subdomains:
-            print(subdomain)
-        print()
+    process_urls(urls, output_file=args.output_file, silent=args.silent)
