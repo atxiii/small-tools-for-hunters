@@ -14,14 +14,14 @@ DumpCrt is a Bash script designed to extract data from the crt.sh database. It p
 ```
 
 **Options:**
-. -o | --orgName: Search for certificates based on organization name.
-. -u: Specify the target or name for the search.
-. --web: Quickly dump data from small targets.
-. -l | --limit: Set the limit for the number of records to fetch (default is 300).
-. -y | --yaml: Generate output in YAML format (default is false).
-. -p | --path: Specify the file path to write the output to.
-. -s | --silent: Remove dummy text and generate clean output.
-. -h | --help: Display help information.
+- -o | --orgName: Search for certificates based on organization name.
+- -u: Specify the target or name for the search.
+- --web: Quickly dump data from small targets.
+- -l | --limit: Set the limit for the number of records to fetch (default is 300).
+- -y | --yaml: Generate output in YAML format (default is false).
+- -p | --path: Specify the file path to write the output to.
+- -s | --silent: Remove dummy text and generate clean output.
+- -h | --help: Display help information.
 
 **Examples:**
 
