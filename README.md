@@ -56,14 +56,15 @@ Fetch data without using the API
 **Notes:**
 
 The script uses the crt.sh API to fetch data from the database.
+
 By default, the script fetches certificates based on the target specified using the -u option.
-The `-o` option allows searching for certificates based on the organization name.
-The `--web` option provides a faster way to dump data from small targets directly without using the API.
-The `-l` option sets the limit for the number of records to fetch. The default limit is 300.
-The `-y` option generates output in YAML format, including subdomains from the COMMON_NAME and NAME_VALUE fields.
-The `-p` option specifies the file path to write the output to. If not provided, the output is displayed on the console.
-The `-s` option removes dummy text and generates clean output, omitting progress information.
-The `-h` option displays help information about the script and its options.
+- The `-o` option allows searching for certificates based on the organization name.
+- The `--web` option provides a faster way to dump data from small targets directly without using the API.
+- The `-l` option sets the limit for the number of records to fetch. The default limit is 300.
+- The `-y` option generates output in YAML format, including subdomains from the COMMON_NAME and NAME_VALUE fields.
+- The `-p` option specifies the file path to write the output to. If not provided, the output is displayed on the console.
+- The `-s` option removes dummy text and generates clean output, omitting progress information.
+- The `-h` option displays help information about the script and its options.
 
 
 ## Reverse Whois for Inetnum
