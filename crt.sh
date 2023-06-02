@@ -171,14 +171,16 @@ fi
 # exit 1
 
 if [ "$web_status" = true ];then
+
 while true; do
-    output=$(curl -s "https://crt.sh/?q=$target&output=json")
+
+   output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
    if echo "$output" | jq . >/dev/null 2>&1; then
       echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
      break
    else
      echo "Parse error occurred. Retrying in 1 seconds..." >&2
-        sleep 1
+     sleep 1
    fi
 done
 exit 0
@@ -211,7 +213,7 @@ fi
 sleep 3
 
 if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
-    [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}"
+    [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}" >&2
     retries=$((retries + 1))
     sleep "$RETRY_DELAY"
 else
@@ -302,6 +304,7 @@ exec_sql() {
          # Print progress row
          tput cuu1 && tput el
          echo "$progress_row" >&2
+         echo "-------------------------------" >&2
         fi
 
         if [ -f "$file" ] && [ -f "$last_offset_file" ]; then
