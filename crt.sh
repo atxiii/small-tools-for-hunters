@@ -137,18 +137,26 @@ if [ -z "$target" ]; then
 fi
 
 if [ "$silent" = false ];then
-  echo "">&2
-  echo "
-  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
-  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
-  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
-  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
-  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
-  echo "">&2
-  echo "">&2
 
-[[ "$web_status" = false ]] && echo -e "Target: ${GREEN}$target${NC}">&2
-[[ "$web_status" = false ]] && echo -e "Limit: ${GREEN}$limit${NC}">&2
+url="https://api.github.com/repos/atxiii/small-tools-for-hunters"
+response=$(curl -s "$url")
+last_updated_date=$(echo "$response" | grep -E '"updated_at":' | awk -F'"' '{print $4}')
+human_readable=$(date -d "$last_updated_date" +"%B %d, %Y %H:%M:%S")
+  echo " _____________________________________________">&2
+  echo "|
+|  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
+|  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
+|  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
+|  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
+|  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
+  echo "|  Last Updated: $human_readable"
+  echo "|">&2
+  echo "|">&2
+
+
+
+[[ "$web_status" = false ]] && echo -e "| Target: ${GREEN}$target${NC}">&2
+[[ "$web_status" = false ]] && echo -e "| Limit: ${GREEN}$limit${NC}">&2
 fi
 
 
@@ -160,7 +168,8 @@ fi
 
 if [ "$silent" = false ];then
 # echo -e "File Path: ${GREEN}$file${NC}"
-echo -e "${GREEN}===🐱===${NC}">&2
+echo -e "|                                          \🐱/                  ">&2
+echo -e "|__________________________________________\||/__________________">&2
 fi
 ############################################### create file
 if [ ! -f "$file" ]; then
@@ -205,7 +214,7 @@ count=$(echo "$count_query" | psql -t -h crt.sh -p 5432 -U guest certwatch)
 
 
 if [ -z "$count" ]; then
-    echo "Error: Count of records is empty." >&2
+    echo " Error: Count of records is empty." >&2
     [[ "$silent" = false ]] && kill "$loading_animation_pid"
     exit 1
 fi
@@ -218,8 +227,8 @@ if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due t
     sleep "$RETRY_DELAY"
 else
     [[ "$silent" = false ]] && kill "$loading_animation_pid"
-    [[ "$silent" = false ]] && echo -e "Total records: ${GREEN}$count${NC}" >&2
-    [[ "$silent" = false ]] && echo -e "${GREEN}===🐱===${NC}" >&2
+    [[ "$silent" = false ]] && echo -e " Total records: ${GREEN}$count${NC}" >&2
+    [[ "$silent" = false ]] && echo -e "" >&2
 fi
 
 done
@@ -281,7 +290,7 @@ exec_sql() {
             ca
             WHERE ci.ISSUER_CA_ID = ca.ID
             ORDER BY le.ENTRY_TIMESTAMP DESC NULLS LAST;
-        END
+							END
         )
         output=$(echo "$query" | psql -t -h crt.sh -p 5432 -U guest certwatch 2>&1)
         if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to"* ]] || [[ "$output" == *"SSL connection has"* ]] || [[ "$output" == *"client_idle_timeout"* ]]; then
