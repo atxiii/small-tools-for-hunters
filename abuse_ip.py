@@ -29,12 +29,16 @@ def extract_subdomains(url):
 def add_main_domain_if_missing(url, subdomain):
     if not url.startswith(subdomain):
         return subdomain +"."+ url
-    return subdomain
+    else:
+      return subdomain
 
 
 def process_urls(urls, output_file=None, silent=False):
 
     for url in urls:
+        if not url:
+            continue
+
         subdomains = extract_subdomains(url)
 
         if not silent:
@@ -45,10 +49,10 @@ def process_urls(urls, output_file=None, silent=False):
 
     if output_file:
         with open(output_file, 'w') as f:
-            for subdomain in subdomains_all:
+            for subdomain in subdomains:
                 f.write(add_main_domain_if_missing(url, subdomain) + '\n')
     elif not silent:
-        for subdomain in subdomains_all:
+        for subdomain in subdomains:
             print(add_main_domain_if_missing(url, subdomain))
 
 if __name__ == '__main__':
