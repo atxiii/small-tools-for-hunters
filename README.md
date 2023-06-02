@@ -17,7 +17,7 @@ DumpCrt is a Bash script designed to extract data from the crt.sh database. It p
 - `-o | --orgName`: Search for certificates based on organization name.
 - `-u:` Specify the target or name for the search.
 - `--web:` Quickly dump data from small targets.
-- `-l | --limit`: Set the limit for the number of records to fetch (default is 300).
+- `-l | --limit`: Limit the count of data to fetch per request. (default is 300).
 - `-y | --yaml`: Generate output in YAML format (default is false).
 - `-p | --path`: Specify the file path to write the output to.
 - `-s | --silent`: Remove dummy text and generate clean output.
@@ -39,7 +39,7 @@ Dump certificates for a target and generate output in YAML format:
 ```bash
 ./crtsh -u walmart.com -y ~/target.yaml
 ```
-Increase the limit to fetch more records (e.g., 500):
+Increase the count of data to fetch per request (e.g., 500):
 ```bash
 ./crtsh -u walmart --limit 500
 ```
@@ -60,11 +60,6 @@ The script uses the crt.sh API to fetch data from the database.
 By default, the script fetches certificates based on the target specified using the -u option.
 - The `-o` option allows searching for certificates based on the organization name.
 - The `--web` option provides a faster way to dump data from small targets directly without using the API.
-- The `-l` option sets the limit for the number of records to fetch. The default limit is 300.
-- The `-y` option generates output in YAML format, including subdomains from the COMMON_NAME and NAME_VALUE fields.
-- The `-p` option specifies the file path to write the output to. If not provided, the output is displayed on the console.
-- The `-s` option removes dummy text and generates clean output, omitting progress information.
-- The `-h` option displays help information about the script and its options.
 
 
 ## Reverse Whois for Inetnum
@@ -105,5 +100,7 @@ echo "target.tld" | sans -d 4 | tee target-sans.subs
 
 
 Feel free to customize and enhance this document based on your specific needs and requirements.
+
+Date: "`r format(Sys.time(), '%d %B, %Y')`"
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/discoverscripts.svg?style=social&label=Follow)](https://twitter.com/hoseinshurabi)
