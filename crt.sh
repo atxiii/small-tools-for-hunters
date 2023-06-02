@@ -14,9 +14,9 @@ GREEN='\033[0;32m' # Green color
 ORANGE='\033[0;33m' # Green color
 NC='\033[0m'       # No color.
 url_validator(){
-	if [[ $1 =~ ^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$ ]]; then
-					echo $1 >&1
-	fi
+ if [[ $1 =~ ^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$ ]]; then
+     echo $1 >&1
+ fi
 }
 print_help() {
     echo "Usage: $0 <target> [OPTIONS] "
@@ -104,7 +104,7 @@ while true; do
             sub_flag=false
             shift
             ;;
-								--web)
+        --web)
             web_status=true
             shift
             ;;
@@ -137,15 +137,15 @@ if [ -z "$target" ]; then
 fi
 
 if [ "$silent" = false ];then
-		echo "">&2
-		echo "
-		·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
-		██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
-		▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
-		██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
-		▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
-		echo "">&2
-		echo "">&2
+  echo "">&2
+  echo "
+  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
+  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
+  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
+  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
+  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
+  echo "">&2
+  echo "">&2
 
 [[ "$web_status" = false ]] && echo -e "Target: ${GREEN}$target${NC}">&2
 [[ "$web_status" = false ]] && echo -e "Limit: ${GREEN}$limit${NC}">&2
@@ -154,8 +154,8 @@ fi
 
 file="$PWD/$target-crtsh.lst"
 if [ "$org_flag" = true ]; then
-				[[ "$silent" = false ]] && echo -e  "Flag: ${GREEN} organizationName${NC}"
-				file="$PWD/$target-org-crtsh.lst"
+    [[ "$silent" = false ]] && echo -e  "Flag: ${GREEN} organizationName${NC}"
+    file="$PWD/$target-org-crtsh.lst"
 fi
 
 if [ "$silent" = false ];then
@@ -173,13 +173,13 @@ fi
 if [ "$web_status" = true ];then
 while true; do
     output=$(curl -s "https://crt.sh/?q=$target&output=json")
-			if echo "$output" | jq . >/dev/null 2>&1; then
-						echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
+   if echo "$output" | jq . >/dev/null 2>&1; then
+      echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
      break
-			else
-					echo "Parse error occurred. Retrying in 1 seconds..." >&2
+   else
+     echo "Parse error occurred. Retrying in 1 seconds..." >&2
         sleep 1
-			fi
+   fi
 done
 exit 0
 fi
@@ -195,7 +195,7 @@ count_query=$(cat <<-END
     SELECT COUNT(*)
     FROM certificate_and_identities cai
     WHERE plainto_tsquery('certwatch', '$target') @@ identities(cai.CERTIFICATE)
-								$([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
+        $([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
         $( [ "$org_flag" = true ] && echo "AND cai.NAME_TYPE = '2.5.4.10'" );
 END
 )
@@ -211,20 +211,20 @@ fi
 sleep 3
 
 if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
-				[[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}"
-				retries=$((retries + 1))
-				sleep "$RETRY_DELAY"
+    [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}"
+    retries=$((retries + 1))
+    sleep "$RETRY_DELAY"
 else
-				[[ "$silent" = false ]] && kill "$loading_animation_pid"
-				[[ "$silent" = false ]] && echo -e "Total records: ${GREEN}$count${NC}" >&2
-				[[ "$silent" = false ]] && echo -e "${GREEN}===🐱===${NC}" >&2
+    [[ "$silent" = false ]] && kill "$loading_animation_pid"
+    [[ "$silent" = false ]] && echo -e "Total records: ${GREEN}$count${NC}" >&2
+    [[ "$silent" = false ]] && echo -e "${GREEN}===🐱===${NC}" >&2
 fi
 
 done
 
 if [ "$count" -eq 0 ];then
-		echo "No records found!" >&2
-		exit 0
+  echo "No records found!" >&2
+  exit 0
 fi
 ###############################################
 
@@ -253,7 +253,7 @@ exec_sql() {
                     SELECT *
                     FROM certificate_and_identities cai
                     WHERE plainto_tsquery('certwatch', '$target') @@ identities(cai.CERTIFICATE)
-																									$([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
+                         $([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
                         $( [ "$org_flag" = true ] && echo "AND cai.NAME_TYPE = '2.5.4.10'" )
                     LIMIT $limit OFFSET $offset
                 ) sub
@@ -279,7 +279,7 @@ exec_sql() {
             ca
             WHERE ci.ISSUER_CA_ID = ca.ID
             ORDER BY le.ENTRY_TIMESTAMP DESC NULLS LAST;
-								END
+        END
         )
         output=$(echo "$query" | psql -t -h crt.sh -p 5432 -U guest certwatch 2>&1)
         if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to"* ]] || [[ "$output" == *"SSL connection has"* ]] || [[ "$output" == *"client_idle_timeout"* ]]; then
@@ -302,7 +302,6 @@ exec_sql() {
          # Print progress row
          tput cuu1 && tput el
          echo "$progress_row" >&2
-         echo "-------------------------------" >&2
         fi
 
         if [ -f "$file" ] && [ -f "$last_offset_file" ]; then
@@ -331,63 +330,63 @@ exec_sql  "$target" "$flag" "$count" "$file"
 
 if [[ -n "$path" ]]; then
 {
-	 [[ "$sub_flag" = false ]] && echo "data:"
-		while IFS='|' read -r issuer_ca_id issuer_name common_name name_values id entry_timestamp not_before not_after serial_number dummy; do
+  [[ "$sub_flag" = false ]] && echo "data:"
+  while IFS='|' read -r issuer_ca_id issuer_name common_name name_values id entry_timestamp not_before not_after serial_number dummy; do
 
-						common_name=$(echo "$common_name" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | tr -d '\n' )
-						name_values=$(echo "$name_values" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | tr -d '\n' )
-						issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g')
-						id=$(echo "$id" | sed -e 's/:{0}\s*\s{2}//g')
-						issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g')
-						serial_number=$(echo "$serial_number" | sed -e 's/:{0}\s*\s{2}//g')
-						not_before=$(echo "$not_before" | sed -e 's/:{0}\s*\s{2}//g')
-						not_after=$(echo "$not_after" | sed -e 's/:{0}\s*\s{2}//g')
+      common_name=$(echo "$common_name" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | tr -d '\n' )
+      name_values=$(echo "$name_values" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | tr -d '\n' )
+      issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g')
+      id=$(echo "$id" | sed -e 's/:{0}\s*\s{2}//g')
+      issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g')
+      serial_number=$(echo "$serial_number" | sed -e 's/:{0}\s*\s{2}//g')
+      not_before=$(echo "$not_before" | sed -e 's/:{0}\s*\s{2}//g')
+      not_after=$(echo "$not_after" | sed -e 's/:{0}\s*\s{2}//g')
 
-						if [ "$sub_flag" = false ]; then
-								echo "  - Issuer CA ID: $issuer_ca_id"
-								echo "    Issuer Name: $issuer_name"
-								echo "    Common Name: $common_name"
-								echo "    Name Values: $name_values"
-								echo "    ID: $id"
-								echo "    Entry Timestamp: $entry_timestamp"
-								echo "    Not Before: $not_before"
-								echo "    Not After: $not_after"
-								echo "    Serial Number: $serial_number"
-						else
-								echo "$common_name"
-								echo "$name_values"
-						fi
-		done < "$file"
-		} > "$path"
-		[[ -n "$path" ]] && [[ "$sub_flag" = false ]] && [[ "$silent" = false ]] && echo "YAML file generated: $path"
+      if [ "$sub_flag" = false ]; then
+        echo "  - Issuer CA ID: $issuer_ca_id"
+        echo "    Issuer Name: $issuer_name"
+        echo "    Common Name: $common_name"
+        echo "    Name Values: $name_values"
+        echo "    ID: $id"
+        echo "    Entry Timestamp: $entry_timestamp"
+        echo "    Not Before: $not_before"
+        echo "    Not After: $not_after"
+        echo "    Serial Number: $serial_number"
+      else
+        echo "$common_name"
+        echo "$name_values"
+      fi
+  done < "$file"
+  } > "$path"
+  [[ -n "$path" ]] && [[ "$sub_flag" = false ]] && [[ "$silent" = false ]] && echo "YAML file generated: $path"
 else
-			[[ "$sub_flag" = false ]] && echo "data:"
-			while IFS='|' read -r issuer_ca_id issuer_name common_name name_values id entry_timestamp not_before not_after serial_number dummy; do
-							common_name=$(echo "$common_name" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | sed '/^$/d;/+/d'  )
-							name_values=$(echo "$name_values" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | sed '/^$/d;/+/d'  )
-							issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g' | sed '/^$/d;/+/d' )
-							id=$(echo "$id" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' | sed '/^$/d;/+/d'  )
-							issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
-							serial_number=$(echo "$serial_number" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
-							not_before=$(echo "$not_before" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
-							not_after=$(echo "$not_after" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
+   [[ "$sub_flag" = false ]] && echo "data:"
+   while IFS='|' read -r issuer_ca_id issuer_name common_name name_values id entry_timestamp not_before not_after serial_number dummy; do
+       common_name=$(echo "$common_name" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | sed '/^$/d;/+/d'  )
+       name_values=$(echo "$name_values" | xxd -p | sed 's/2b0a//g;s/20//g;s/2a2e//g;s/0a//gm' | xxd -r -p | sed '/^$/d;/+/d'  )
+       issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g' | sed '/^$/d;/+/d' )
+       id=$(echo "$id" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' | sed '/^$/d;/+/d'  )
+       issuer_ca_id=$(echo "$issuer_ca_id" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
+       serial_number=$(echo "$serial_number" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
+       not_before=$(echo "$not_before" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
+       not_after=$(echo "$not_after" | sed -e 's/:{0}\s*\s{2}//g'| sed '/^$/d;/+/d' )
 
-							if [ "$sub_flag" = false ]; then
-									echo "  - Issuer CA ID: $issuer_ca_id"
-									echo "    Issuer Name: $issuer_name"
-									echo "    Common Name: $common_name"
-									echo "    Name Values: $name_values"
-									echo "    ID: $id"
-									echo "    Entry Timestamp: $entry_timestamp"
-									echo "    Not Before: $not_before"
-									echo "    Not After: $not_after"
-									echo "    Serial Number: $serial_number"
-							else
-										 url_validator "$common_name" | sed '/^$/d'
-										 url_validator "$name_values" | sed '/^$/d'
-							fi
-			done < "$file"
+       if [ "$sub_flag" = false ]; then
+         echo "  - Issuer CA ID: $issuer_ca_id"
+         echo "    Issuer Name: $issuer_name"
+         echo "    Common Name: $common_name"
+         echo "    Name Values: $name_values"
+         echo "    ID: $id"
+         echo "    Entry Timestamp: $entry_timestamp"
+         echo "    Not Before: $not_before"
+         echo "    Not After: $not_after"
+         echo "    Serial Number: $serial_number"
+       else
+           url_validator "$common_name" | sed '/^$/d'
+           url_validator "$name_values" | sed '/^$/d'
+       fi
+   done < "$file"
 fi
 
 # remove temp file
-			rm "$file"
+   rm "$file"
