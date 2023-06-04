@@ -1,16 +1,24 @@
 #!/usr/bin/env python
-
+import time
 import argparse
 import requests
 from bs4 import BeautifulSoup
 import sys
 from urllib.parse import urlparse
+import random
 
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+with open('useragent.txt', 'r') as f:
+    user_agents = f.readlines()
+    user_agents = [ua.strip() for ua in user_agents]
+    DEFAULT_USER_AGENT=random.choice(user_agents)
+
 
 def extract_subdomains(url,silent):
     headers = {'User-Agent': DEFAULT_USER_AGENT}
+    print(headers)
     response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers)
+    time.sleep(2)
     if response.status_code == 200:
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
@@ -22,7 +30,10 @@ def extract_subdomains(url,silent):
         else:
             if not silent : print(f"No subdomains found for {url}")
     else:
-       if not silent : print(f"The CDN blocked us!: {response.status_code}")
+       if not silent :
+           print(f"The CDN blocked us!: {response.status_code}")
+           sys.exit(1)
+
 
     return []
 
@@ -40,9 +51,7 @@ def process_urls(urls, output_file=None, silent=False):
     for url in urls:
         if not url:
             continue
-
         subdomains = extract_subdomains(url,silent)
-
         if not silent:
             print(f"Subdomains for {url}:")
             for subdomain in subdomains:
