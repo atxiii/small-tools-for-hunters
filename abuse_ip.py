@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
-def extract_subdomains(url):
+def extract_subdomains(url,silent):
     headers = {'User-Agent': DEFAULT_USER_AGENT}
     response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers)
     if response.status_code == 200:
@@ -20,14 +20,16 @@ def extract_subdomains(url):
             subdomain_list = [subdomain.text for subdomain in subdomains]
             return subdomain_list
         else:
-            print(f"No subdomains found for {url}")
+            if not silent : print(f"No subdomains found for {url}")
     else:
-        print(f"Error accessing {url}: {response.status_code}")
+       if not silent : print(f"Error accessing {url}: {response.status_code}")
 
     return []
 
 def add_main_domain_if_missing(url, subdomain):
     if not url.startswith(subdomain):
+        if url.startswith('www.'):
+            url = url[4:]
         return subdomain +"."+ url
     else:
       return subdomain
@@ -39,7 +41,7 @@ def process_urls(urls, output_file=None, silent=False):
         if not url:
             continue
 
-        subdomains = extract_subdomains(url)
+        subdomains = extract_subdomains(url,silent)
 
         if not silent:
             print(f"Subdomains for {url}:")

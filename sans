@@ -12,8 +12,9 @@ echo "" > "/tmp/sans_arr_sans"
 depth=2
 sans_clean=''
 k=0
-OPTIONS="d:"
-LONG_OPTIONS="depth,help"
+silent_status=false
+OPTIONS="sd:"
+LONG_OPTIONS="depth,silent,help"
 PARSED_OPTIONS=$(getopt -o "$OPTIONS" --long "$LONG_OPTIONS" -- "$@")
 
 if [ $? -ne 0 ]; then
@@ -40,6 +41,10 @@ while true; do
             depth=$2
             shift 2
             ;;
+        -s|--silent)
+            silent_status=true
+            shift
+            ;;
         -h|--help)
             help_fn
             exit 0
@@ -59,7 +64,7 @@ get_sans(){
     while read -r d && [ "$k" -lt "$depth" ]; do
         d=${d#*//}
 
-        echo -e "\033[0;33m[🐱]\033[0;35m Looking for SANs in: $d\033[0m" >&2
+        [[ "$silent_status" = false ]] && echo -e "\033[0;33m[🐱]\033[0;35m Looking for SANs in: $d\033[0m" >&2
 
         if echo "$(curl --max-time 5 -s "$d:443")" | grep -iq "HTML"; then
             {
@@ -74,8 +79,10 @@ get_sans(){
         k=$((k+1))
         cat "/tmp/sans_arr_sans" | tr ' ' '\n' | sort -u | get_sans
     else
-        echo '=====================================' >&2
-        echo -e '\033[0;35m[🐱]\033[0;36m Finish\033[0m' >&2
+        if [ "$silent_status" = fase ];then
+            echo '=====================================' >&2
+            echo -e '\033[0;35m[🐱]\033[0;36m Finish\033[0m' >&2
+        fi
         rm -rf "/tmp/sans_arr_sans"
     fi
 }

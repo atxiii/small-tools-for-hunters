@@ -161,6 +161,7 @@ fi
 
 
 file="$PWD/$target-crtsh.lst"
+
 if [ "$org_flag" = true ]; then
     [[ "$silent" = false ]] && echo -e  "Flag: ${GREEN} organizationName${NC}"
     file="$PWD/$target-org-crtsh.lst"
@@ -171,30 +172,40 @@ if [ "$silent" = false ];then
 echo -e "|                                          \🐱/                  ">&2
 echo -e "|__________________________________________\||/__________________">&2
 fi
-############################################### create file
-if [ ! -f "$file" ]; then
-    touch "$file"
-fi
+
 ############################################## Calc Count of data
 
 # exit 1
 
 if [ "$web_status" = true ];then
+    if [[ -n "$path" ]]; then
 
-while true; do
-
-   output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
-   if echo "$output" | jq . >/dev/null 2>&1; then
-      echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
-     break
-   else
-     echo "Parse error occurred. Retrying in 1 seconds..." >&2
-     sleep 1
-   fi
-done
-exit 0
+        { while true; do
+        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
+        if echo "$output" | jq . >/dev/null 2>&1; then
+            echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
+            break
+        else
+            echo "Fucking busy site. Retrying..." >&2
+            sleep 1
+        fi
+        done
+        exit 0
+        } > $path
+    else
+        while true; do
+        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
+        if echo "$output" | jq . >/dev/null 2>&1; then
+            echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
+            break
+        else
+            echo "Parse error occurred. Retrying in 1 seconds..." >&2
+            sleep 1
+        fi
+        done
+        exit 0
+    fi
 fi
-
 while [ "$retries" -lt "$MAX_RETRIES_count" ] && [ "$count" -eq 0 ] ; do
 [[ "$count" -eq 0 ]] && retries=$((retries + 1))
 if [ "$silent" = false ];then
@@ -329,7 +340,7 @@ exec_sql() {
         else
             # Remove the last offset file if all records have been fetched
             rm -f "$last_offset_file"
-           [[ "$silent" = false ]] && echo -e "$GREEN[🐱] Finish $NC" &>2
+           [[ "$silent" = false ]] && echo -e "$GREEN[🐱] Finish $NC" >&2
 
         fi
     else
@@ -339,6 +350,8 @@ exec_sql() {
 
 exec_sql  "$target" "$flag" "$count" "$file"
 
+echo "=========="
+echo "path:$path"
 
 if [[ -n "$path" ]]; then
 {
