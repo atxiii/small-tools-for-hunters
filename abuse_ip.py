@@ -22,7 +22,7 @@ def extract_subdomains(url,silent):
         else:
             if not silent : print(f"No subdomains found for {url}")
     else:
-       if not silent : print(f"Error accessing {url}: {response.status_code}")
+       if not silent : print(f"The CDN blocked us!: {response.status_code}")
 
     return []
 

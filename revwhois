@@ -12,8 +12,7 @@ ORANGE='\033[0;33m' # Green color
 NC='\033[0m'       # No color.
 
 while read -r IP_ADDRESS; do
-  echo -e "\033[0;33m[🐱]\033[0;35m Reverse WHOIS lookup for: $IP_ADDRESS \033[0m"
-  {
+
 		#RIPE
 		whois $IP_ADDRESS | awk -F':' '/admin-c:/ { print $2 }' | tr -d ' ' | while IFS= read -r admin_c; do                           ok
       whois -h whois.ripe.net -- "-i person $admin_c" | awk -F':' '/inetnum:/ { print $2 }' | tr -d ' '
@@ -27,5 +26,5 @@ while read -r IP_ADDRESS; do
     #AFRINIC
     whois -h whois.afrinic.net $IP_ADDRESS | grep inetnum | cut -d':' -f2 | tr -d ' '
     # whois -h whois.afrinic.net $IP_ADDRESS | grep inet6num | cut -d':' -f2- | tr -d ' '
-  } | tee >(cat >&2)
+
 done
