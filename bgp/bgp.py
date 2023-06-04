@@ -99,11 +99,9 @@ ENDPOINTS = {
 
 def fetch_data(input, ref):
     url = ENDPOINTS[ref].format(i=input)
-    print(url)
     response = requests.get(url)
     data = response.json()
     return data
-
 
 def get_value_by_path(data, filters):
     value = data
@@ -145,6 +143,7 @@ def apply_filters(input, args):
     else:
         filtered_data = data
 
+    filtered_data['target']= input
     json_data = json.dumps(filtered_data, indent=4)
     print(json_data)
 
