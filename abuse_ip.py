@@ -6,18 +6,12 @@ import requests
 from bs4 import BeautifulSoup
 import sys
 from urllib.parse import urlparse
-import random
 
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-with open('useragent.txt', 'r') as f:
-    user_agents = f.readlines()
-    user_agents = [ua.strip() for ua in user_agents]
-    DEFAULT_USER_AGENT=random.choice(user_agents)
 
 
 def extract_subdomains(url,silent):
     headers = {'User-Agent': DEFAULT_USER_AGENT}
-    print(headers)
     response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers)
     time.sleep(2)
     if response.status_code == 200:

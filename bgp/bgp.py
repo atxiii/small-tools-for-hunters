@@ -113,7 +113,7 @@ def get_value_by_path(data, filters):
 def apply_filters(input, args):
     connection = sqlite3.connect("cache.db")
     cursor = connection.cursor()
-
+    update = args.update
     ref = args.ref[0]
     cache_key = f"{ref}_{input}"
     filtered_data = {}
@@ -124,15 +124,22 @@ def apply_filters(input, args):
     except Exception as e:
         print(f"Error occurred: {e}")
 
-    if result is not None:
+    if result is not None and update is False:
         data = json.loads(result[0])
     else:
         data = fetch_data(input, ref)
-        try:
-            cursor.execute("INSERT INTO cache (key, data) VALUES (?, ?)", (cache_key, json.dumps(data)))
-            connection.commit()
-        except Exception as e:
-            print(f"Error occurred: {e}")
+        if update:
+            try:
+                cursor.execute("UPDATE cache SET data = ? WHERE key = ?", (json.dumps(data), cache_key))
+                connection.commit()
+            except Exception as e:
+                print(f"Error occurred: {e}")
+        else:
+            try:
+                cursor.execute("INSERT INTO cache (key, data) VALUES (?, ?)", (cache_key, json.dumps(data)))
+                connection.commit()
+            except Exception as e:
+                print(f"Error occurred: {e}")
 
 
     if args.filter:
@@ -173,12 +180,12 @@ def is_cache_db_exist():
     return os.path.exists("cache.db")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='BGPview API')
+    parser = argparse.ArgumentParser(description='BGPview API v0.2.0')
     parser.add_argument('-ref', nargs='*', help='Add your reference')
-    parser.add_argument('-o', dest='output_file', help='Save data to a file')
     parser.add_argument('-i', '--input', help='Input')
     parser.add_argument('-f', '--filter', nargs='+', help='Filters to apply')
     parser.add_argument('-s', '--silent', action='store_true', help='Silent mode')
+    parser.add_argument('-u', '--update', action='store_true', help='update database')
     args = parser.parse_args()
 
     if not is_cache_db_exist():

@@ -137,28 +137,26 @@ if [ -z "$target" ]; then
 fi
 
 if [ "$silent" = false ];then
-
-url="https://api.github.com/repos/atxiii/small-tools-for-hunters"
-response=$(curl -s "$url")
-last_updated_date=$(echo "$response" | grep -E '"updated_at":' | awk -F'"' '{print $4}')
-human_readable=$(date -d "$last_updated_date" +"%B %d, %Y %H:%M:%S")
-  echo " _____________________________________________">&2
-  echo "|
-|  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
-|  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
-|  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
-|  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
-|  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
-  echo "|  Last Updated: $human_readable"
-  echo "|">&2
-  echo "|">&2
-
+    url="https://api.github.com/repos/atxiii/small-tools-for-hunters"
+    response=$(curl -s "$url")
+    last_updated_date=$(echo "$response" | grep -E '"updated_at":' | awk -F'"' '{print $4}')
+    human_readable=$(date -d "$last_updated_date" +"%B %d, %Y %H:%M:%S")
+    echo " _____________________________________________">&2
+    echo "|
+    |  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
+    |  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
+    |  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
+    |  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
+    |  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
+    echo "|  Last Updated: $human_readable"
+    echo "|">&2
+    echo "|">&2
 
 
-[[ "$web_status" = false ]] && echo -e "| Target: ${GREEN}$target${NC}">&2
-[[ "$web_status" = false ]] && echo -e "| Limit: ${GREEN}$limit${NC}">&2
+
+    [[ "$web_status" = false ]] && echo -e "| Target: ${GREEN}$target${NC}">&2
+    [[ "$web_status" = false ]] && echo -e "| Limit: ${GREEN}$limit${NC}">&2
 fi
-
 
 file="$PWD/$target-crtsh.lst"
 
@@ -168,20 +166,27 @@ if [ "$org_flag" = true ]; then
 fi
 
 if [ "$silent" = false ];then
-# echo -e "File Path: ${GREEN}$file${NC}"
-echo -e "|                                          \🐱/                  ">&2
-echo -e "|__________________________________________\||/__________________">&2
+    # echo -e "File Path: ${GREEN}$file${NC}"
+    echo -e "|                                          \🐱/                  ">&2
+    echo -e "|__________________________________________\||/__________________">&2
 fi
 
 ############################################## Calc Count of data
 
-# exit 1
+############################################## Web
 
 if [ "$web_status" = true ];then
-    if [[ -n "$path" ]]; then
 
+    if [ "$org_flag" = true ];then
+        query="O"
+    else
+        query="q"
+    fi
+
+    if [[ -n "$path" ]]; then
         { while true; do
-        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
+        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "$query=$target")
+
         if echo "$output" | jq . >/dev/null 2>&1; then
             echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
             break
@@ -194,12 +199,12 @@ if [ "$web_status" = true ];then
         } > $path
     else
         while true; do
-        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "q=$target")
+        output=$(curl -s -G  "https://crt.sh/?output=json" --data-urlencode "$query=$target")
         if echo "$output" | jq . >/dev/null 2>&1; then
             echo "$output" | jq -r '.[] | "\(.name_value)\n\(.common_name)"' | sed 's/\*.//g' | grep -Eo '^([a-zA-Z]+://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$' | sort -u >&1
             break
         else
-            echo "Parse error occurred. Retrying in 1 seconds..." >&2
+            echo "Fucking busy site, Retrying in 1 seconds..." >&2
             sleep 1
         fi
         done
@@ -207,40 +212,40 @@ if [ "$web_status" = true ];then
     fi
 fi
 while [ "$retries" -lt "$MAX_RETRIES_count" ] && [ "$count" -eq 0 ] ; do
-[[ "$count" -eq 0 ]] && retries=$((retries + 1))
-if [ "$silent" = false ];then
-loading_animation &
-loading_animation_pid=$!
-fi
+    [[ "$count" -eq 0 ]] && retries=$((retries + 1))
+    if [ "$silent" = false ];then
+    loading_animation &
+    loading_animation_pid=$!
+    fi
 
-count_query=$(cat <<-END
-    SELECT COUNT(*)
-    FROM certificate_and_identities cai
-    WHERE plainto_tsquery('certwatch', '$target') @@ identities(cai.CERTIFICATE)
-        $([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
-        $( [ "$org_flag" = true ] && echo "AND cai.NAME_TYPE = '2.5.4.10'" );
-END
-)
-count=$(echo "$count_query" | psql -t -h crt.sh -p 5432 -U guest certwatch)
+    count_query=$(cat <<-END
+        SELECT COUNT(*)
+        FROM certificate_and_identities cai
+        WHERE plainto_tsquery('certwatch', '$target') @@ identities(cai.CERTIFICATE)
+            $([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
+            $( [ "$org_flag" = true ] && echo "AND cai.NAME_TYPE = '2.5.4.10'" );
+    END
+    )
 
+    count=$(echo "$count_query" | psql -t -h crt.sh -p 5432 -U guest certwatch)
 
-if [ -z "$count" ]; then
-    echo " Error: Count of records is empty." >&2
-    [[ "$silent" = false ]] && kill "$loading_animation_pid"
-    exit 1
-fi
+    if [ -z "$count" ]; then
+        echo " Error: Count of records is empty." >&2
+        [[ "$silent" = false ]] && kill "$loading_animation_pid"
+        exit 1
+    fi
 
-sleep 3
+    sleep 1
 
-if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
-    [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}" >&2
-    retries=$((retries + 1))
-    sleep "$RETRY_DELAY"
-else
-    [[ "$silent" = false ]] && kill "$loading_animation_pid"
-    [[ "$silent" = false ]] && echo -e " Total records: ${GREEN}$count${NC}" >&2
-    [[ "$silent" = false ]] && echo -e "" >&2
-fi
+    if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
+        [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}" >&2
+        retries=$((retries + 1))
+        sleep "$RETRY_DELAY"
+    else
+        [[ "$silent" = false ]] && kill "$loading_animation_pid"
+        [[ "$silent" = false ]] && echo -e " Total records: ${GREEN}$count${NC}" >&2
+        [[ "$silent" = false ]] && echo -e "" >&2
+    fi
 
 done
 
@@ -414,4 +419,4 @@ else
 fi
 
 # remove temp file
-   rm "$file"
+[[ -z "$path" ]] && rm "$file"
