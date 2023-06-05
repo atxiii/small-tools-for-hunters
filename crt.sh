@@ -49,7 +49,7 @@ loading_animation() {
 
     local frame_index=0
     while :; do
-        printf "${ORANGE}[%s]Counting Records...${NC}\r " "${animation_frames[frame_index]}" >&2
+        printf "${ORANGE}[%s]Counting Fucking Records...${NC}\r " "${animation_frames[frame_index]}" >&2
         frame_index=$(( (frame_index + 1) % total_frames ))
         sleep "$delay_seconds"
     done
@@ -59,8 +59,8 @@ loading_animation() {
 ############################################### Vars
 offset=0
 MAX_RETRIES=50
-MAX_RETRIES_count=20
-RETRY_DELAY=5
+MAX_RETRIES_count=50
+RETRY_DELAY=1
 retries=0
 org_flag=false
 sub_flag=true
@@ -143,11 +143,11 @@ if [ "$silent" = false ];then
     human_readable=$(date -d "$last_updated_date" +"%B %d, %Y %H:%M:%S")
     echo " _____________________________________________">&2
     echo "|
-    |  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
-    |  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
-    |  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
-    |  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
-    |  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
+|  ·▄▄▄▄  ▄• ▄▌• ▌ ▄ ·.  ▄▄▄· ▄▄· ▄▄▄  ▄▄▄▄▄
+|  ██▪ ██ █▪██▌·██ ▐███▪▐█ ▄█▐█ ▌▪▀▄ █·•██
+|  ▐█· ▐█▌█▌▐█▌▐█ ▌▐▌▐█· ██▀·██ ▄▄▐▀▀▄  ▐█.▪
+|  ██. ██ ▐█▄█▌██ ██▌▐█▌▐█▪·•▐███▌▐█•█▌ ▐█▌·
+|  ▀▀▀▀▀•  ▀▀▀ ▀▀  █▪▀▀▀.▀   ·▀▀▀ .▀  ▀ ▀▀▀ ">&2
     echo "|  Last Updated: $human_readable"
     echo "|">&2
     echo "|">&2
@@ -229,21 +229,15 @@ END
 
     count=$(echo "$count_query" | psql -t -h crt.sh -p 5432 -U guest certwatch)
 
-    if [ -z "$count" ]; then
-        echo " Error: Count of records is empty." >&2
-        [[ "$silent" = false ]] && kill "$loading_animation_pid"
-        exit 1
-    fi
-
-    sleep 1
-
-    if [[ "$output" == *"timeout"* ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
-        [[ "$silent" = false ]] && echo -e "[-] ${RED}Connection timeout occurred. Retrying..${NC}" >&2
+    if [[ "$output" == *"timeout"* ]] || [[ -z "$count" ]] || [[ "$output" == *"canceling statement due to statement"* ]] || [[ "$output" == *"canceling statement due to conflict"* ]] || [[ "$output" == *"SSL connection has"* ]] ; then
+        [[ "$silent" = false ]] && echo -e "[-] ${RED}Fucking connection timeout occurred. Retrying..${NC}" >&2
         retries=$((retries + 1))
+        count=0
         sleep "$RETRY_DELAY"
+        [[ "$silent" = false ]] && kill "$loading_animation_pid"
     else
         [[ "$silent" = false ]] && kill "$loading_animation_pid"
-        [[ "$silent" = false ]] && echo -e " Total records: ${GREEN}$count${NC}" >&2
+        [[ "$silent" = false ]] && echo -e "Fucking Total records: ${GREEN}$count${NC}" >&2
         [[ "$silent" = false ]] && echo -e "" >&2
     fi
 
@@ -319,7 +313,7 @@ exec_sql() {
 
     if [ "$success" = true ]; then
 
-        if [ "$silent" = false ];then
+        if [[ "$silent" = false  && -n "$total_records" ]];then
          # Calculate progress percentage
          total_records="$count"
          fetched_records="$((offset + limit))"
@@ -329,7 +323,6 @@ exec_sql() {
          # Print progress row
          tput cuu1 && tput el
          echo "$progress_row" >&2
-         echo "-------------------------------" >&2
         fi
 
         if [ -f "$file" ] && [ -f "$last_offset_file" ]; then
