@@ -224,7 +224,7 @@ while [ "$retries" -lt "$MAX_RETRIES_count" ] && [ "$count" -eq 0 ] ; do
         WHERE plainto_tsquery('certwatch', '$target') @@ identities(cai.CERTIFICATE)
             $([[ "$target" =~ $space_regex ]] && echo "AND plainto_tsquery('certwatch', '$target') @@ to_tsvector('certwatch', cai.NAME_VALUE)" || echo "AND cai.NAME_VALUE ILIKE ('%' || '$target' || '%')")
             $( [ "$org_flag" = true ] && echo "AND cai.NAME_TYPE = '2.5.4.10'" );
-    END
+END
     )
 
     count=$(echo "$count_query" | psql -t -h crt.sh -p 5432 -U guest certwatch)
