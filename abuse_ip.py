@@ -7,11 +7,13 @@ from bs4 import BeautifulSoup
 import sys
 from urllib.parse import urlparse
 
-DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-
+headers ={
+  'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/113.0',
+  'Connection': 'keep-alive',
+  'Cookie': 'XSRF-TOKEN='
+}
 
 def extract_subdomains(url,silent):
-    headers = {'User-Agent': DEFAULT_USER_AGENT}
     response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers)
     time.sleep(2)
     if response.status_code == 200:
