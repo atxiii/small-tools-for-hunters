@@ -14,7 +14,7 @@ headers ={
 }
 
 def extract_subdomains(url,silent):
-    response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers)
+    response = requests.get(f"https://www.abuseipdb.com/whois/{url}", headers=headers,verify=True)
     time.sleep(2)
     if response.status_code == 200:
         html = response.text
