@@ -1,9 +1,6 @@
 ## Description
 
-Sometimes you are fuzzing and you don't know your fuzzing are works correctly or not! so you can find a hook from the site and place on your wordlist to make sure your fuzz are working as well.
-
-for example:
-I know the /blabla/ is exist. so I spwan it to my wordlist to make sure the fuzzing works well.
+When you're conducting fuzzing tests, it's important to verify whether your fuzzing is working correctly. To do this, you can identify a known endpoint on the target site and insert it into your wordlist. This way, you can confirm that your fuzzing is functioning as intended. For instance, if you know that '/blabla/' exists, you can add it to your wordlist to ensure the effectiveness of your fuzzing tests.
 
 ### Command:
 ```sh
