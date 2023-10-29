@@ -3,6 +3,7 @@ Welcome to the "Small Tools for Hunters" repository! Here, I share a collection 
 
 I am committed to maintaining and updating these tools to ensure they remain effective and relevant. Your support is greatly appreciated, so don't forget to give the tools a star if you find them useful!
 
+
 Happy hunting!
 
 ## Wikis
@@ -17,6 +18,7 @@ Happy hunting!
 
 
 Feel free to customize and enhance this document based on your specific needs and requirements.
+Also, you can send any issue or question through Telegram. link: [Small tool for hunters](https://t.me/+DOjioXCgWrNjOWQ0)
 
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/discoverscripts.svg?style=social&label=Follow)](https://twitter.com/hoseinshurabi)
