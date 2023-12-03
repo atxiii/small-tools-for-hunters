@@ -50,10 +50,8 @@ def process_urls(urls, output_file=None, silent=False):
             continue
         subdomains = extract_subdomains(url,silent)
         if not silent:
-            print(f"Subdomains for {url}:")
             for subdomain in subdomains:
                 print(add_main_domain_if_missing(url, subdomain))
-            print()
 
     if output_file:
         with open(output_file, 'w') as f:
