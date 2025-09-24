@@ -12,7 +12,7 @@
     'use strict';
 
     const webhooks = {
-        "General": "https://discord.com/api/webhooks/1419767332447981588/Ga7X-NWYlj9bVQkngBh4EhKOaU1eaYzfqSqNMsDuU4btJAzEabN72lLqxT9XBDJ0cKEM",
+        "General": "https://discord.com/api/webhooks/blablabla",
         "Alerts": "https://discord.com/api/webhooks/ID2/TOKEN2",
         "Logs": "https://discord.com/api/webhooks/ID3/TOKEN3"
     };
