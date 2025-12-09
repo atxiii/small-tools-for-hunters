@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Paths Finder
+// @name         Path Finder
 // @namespace
-// @description  Capture webpage URLs (right click on the web page and the RunScanner button appears, and if you want to close it just click it the click close!)
+// @description  Capture webpage URLs (right click on the web page and the RunScanner button appears)
 // @version      1.6
 // @match        *://*/*
 // @run-at       document-end
@@ -10,9 +10,9 @@
 // ==/UserScript==
 
 (function() {
-
     let triggerBtn = document.createElement("button");
     triggerBtn.textContent = "Run Scanner";
+    triggerBtn.style.color= "black";
     triggerBtn.style.position = "fixed";
     triggerBtn.style.top = "10px";
     triggerBtn.style.left = "10px";
@@ -27,6 +27,15 @@
 
     document.addEventListener("contextmenu", function() {
         triggerBtn.style.display = "block";
+
+        function hideOnNextClick(ev) {
+            if (ev.target !== triggerBtn) {
+                triggerBtn.style.display = "none";
+            }
+            document.removeEventListener("mousedown", hideOnNextClick);
+        }
+
+        document.addEventListener("mousedown", hideOnNextClick);
     });
 
     triggerBtn.addEventListener("click", function() {
@@ -35,6 +44,7 @@
     });
 
     function runScanner() {
+
         let box = document.createElement("div");
         box.style.position = "fixed";
         box.style.bottom = "0";
@@ -48,6 +58,7 @@
         box.style.display = "flex";
         box.style.flexDirection = "column";
 
+        // Sticky header
         let header = document.createElement("div");
         header.style.flex = "0 0 auto";
         header.style.display = "flex";
@@ -57,21 +68,21 @@
         header.style.borderBottom = "1px solid #ccc";
         header.style.background = "#f5f5f5";
 
-        let closeBtn = document.createElement("button");
-        closeBtn.textContent = "Close";
-        closeBtn.style.border = "1px solid gray";
-        closeBtn.style.background = "#eee";
-        closeBtn.onclick = () => box.remove();
+        let title = document.createElement("h4");
+        title.textContent = "Unique Paths Found:";
+        title.style.margin = "0";
+        title.style.flex = "1";
 
         let copyBtn = document.createElement("button");
         copyBtn.textContent = "Copy";
         copyBtn.style.border = "1px solid gray";
         copyBtn.style.background = "#eee";
 
-        let title = document.createElement("h4");
-        title.textContent = "Unique Paths Found:";
-        title.style.margin = "0";
-        title.style.flex = "1";
+        let closeBtn = document.createElement("button");
+        closeBtn.textContent = "Close";
+        closeBtn.style.border = "1px solid gray";
+        closeBtn.style.background = "#eee";
+        closeBtn.onclick = () => box.remove();
 
         header.appendChild(title);
         header.appendChild(copyBtn);
