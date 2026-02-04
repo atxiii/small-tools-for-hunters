@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Google Search Links Collector
-// @namespace    http://tampermonkey.net/
-// @version      0.3
+// @namespace    https://jsecurity.ir/
+// @version      1.1
 // @description  Collect and download Google search result links page by page
-// @author       You
+// @author       Hossein Shourabi
 // @match        https://www.google.com/search*
 // @grant        none
 // ==/UserScript==
@@ -25,9 +25,15 @@
     function extractLinks() {
         const links = [];
         document.querySelectorAll('#rso [jscontroller] a[jsname]').forEach(el => {
-            const ping = el.getAttribute('ping');
-            if (!ping) return;
-            const urlPart = ping.split('&url=')[1];
+            let url;
+            for (const attr of el.attributes) {
+                if (attr.value && attr.value.includes('&url=')) {
+                    url = attr.value;
+                    break;
+                }
+            }
+            if (!url) return;
+            const urlPart = url.split('&url=')[1];
             if (urlPart) {
                 try {
                     links.push(decodeURIComponent(urlPart.split('&')[0]));
